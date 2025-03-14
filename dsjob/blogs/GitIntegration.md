@@ -4,23 +4,23 @@ Git Integration is a mechanism to write your project contents to a Git repositor
 
 DataStage customers would like to use Git as means for version control their project assets in CloudPak Projects. It will also help them promote their Development work into higher environments by integrating Git into their CI/CD process.
 
-DataStage implements Git Integration as part of ds-migration service. Currently ds-migration service hosts all export and import functionality for the projects. New Api are added to the ds-migration service to allow users to commit and pull their work from git using the existing export and import functionalities.
+DataStage implements Git Integration as part of ds-migration service. Currently ds-migration service hosts all export and import functionality for the projects. New APIs are added to the ds-migration service to allow users to commit and pull their work from git using the existing export and import functionalities.
 
-Before invoking the API, project needs to be Git enabled. This will setup initial configuration for the project and can be overridden by individual operations to Git.
-This functionality will allow you to update incremental changes from your project where you collaborate and build functionality and sync to Git repo. It is then possible to promote your tested projects to higher environments such as QA and eventually to Production.
+Before invoking the API, the project needs to be Git enabled. This will setup the initial configuration for the project and can be overridden by individual operations to Git.
+This functionality will allow you to update incremental changes from your project where you collaborate and sync to a Git repo. It is then possible to promote your tested projects to higher environments such as QA and eventually to Production.
 
 Git Integration provides three commands:
 - `git-commit`: Allow CPD Project resources to push and commit to Git repository
-- `git-pull`: Allow project artifacts from Git repository to pull and update into CPD Projects
+- `git-pull`: Allow project artifacts from Git repository to pull into and update CPD Projects
 - `git-status`: Provides status on resource to identify the differences between the CPD Project and the Git repository
 
 A bit of background...
-- Git Integration is also available before 5.x releases and was implemented as a CLI side functionality. It did not require user to configure the projects with Git Integration.
-- CLI tooling has limitations and other scalability issues. We now have Git Integration  implemented into DataStage Migration service. This now require additional steps to configure.
-- Git repositories used before 5.x releases are still backward compatible
+- Git Integration is also available before 5.x releases and was implemented as a CLI side functionality. It did not require users to configure the projects with Git Integration.
+- CLI tooling has limitations and other scalability issues. We now have Git Integration implemented into the DataStage Migration service. This now requires additional steps to configure.
+- Git repositories used before 5.x releases are still backward compatible.
 
 #### Setting up Git Integration for the project
-For allowing project to be aware of Git Integration we need to enable them to track changes internally of all the resources in a project. This requires iusers to explicitly configure the project for Git Integration using the following command.
+To allow a CPD project to be aware of Git Integration, users need to enable Git to track internal changes of all resources in a project. This requires users to explicitly configure the project for Git Integration using the following command.
 ```
 cpdctl dsjob git-configure {--project PROJECT | --project-id PROJID} [--git-enable] [--git-url URL] [--git-owner OWNER] [--git-token TOKEN] [--git-org ORG] [--git-email EMAIL] [--git-provider GITPROVIDER]  [--git-branch GITBRANCH]  [--git-folder GITFOLDER]
 ``` 
@@ -36,13 +36,13 @@ cpdctl dsjob git-configure {--project PROJECT | --project-id PROJID} [--git-enab
 -  `git-folder` Folder to which this project will be committed or fetched from. This is optional
 
 Git URL is the destination of your organizations git URL. Git owner is the user who commits to Git and the Git token is the user’s token used for auth. Fields `git-owner`, `git-org` are deducible to the URL and can be removed from the command eventually. 
-Currently git is configurable with Auth Token but will support SSL certs in the futurei. Also we only support https enabled repositories in this release.
+Currently git is configurable with Auth Token but will support SSL certs in the future. Also we only support https enabled repositories in this release.
 
 Git can also be configured from UI
 
 ![GitConfiguration](gitconfiguration.png)
 
-Once git is configured, Migration service starts collecting data on all assets that are added, modified or deleted so that we tally these assets to allow user to accurately get status on the CPD Project against Git repo. This will consume some cluster resource and can be managed using the [tracking](https://github.com/IBM/DataStage/blob/main/dsjob/dsjob.5.1.0.md#managing-git-project-tracking-data) api to turn it on when needed.
+Once git is configured, the Migration service starts collecting data on all assets that are added, modified or deleted so that we tally these assets to allow users to accurately get statuses on the CPD Project against the Git repo. This will consume some cluster resources and can be managed using the [tracking](https://github.com/IBM/DataStage/blob/main/dsjob/dsjob.5.1.0.md#managing-git-project-tracking-data) api to turn it on when needed.
 
 Use the provided [git-operations](https://github.com/IBM/DataStage/blob/main/dsjob/dsjob.5.1.0.md#git-integration) to integrate your CPD project with Git.
 
@@ -50,21 +50,21 @@ Use the provided [git-operations](https://github.com/IBM/DataStage/blob/main/dsj
 This Api allows users to commit their project as a whole or incrementally into Git. When a project is committed to Git, it maintains a specific structure of this project in Git.
 
 Each action is a single signed commit.
-Commit takes assets from project and writes to Git repo under a branch and a folder. User must make sure that each project is maintained into a separate folder to make sure that project data is not overlapped.
+Commit takes assets from the project and writes to the Git repo under a branch and a folder. Users must make sure that each project is maintained in a separate folder to make sure that project data is not overlapped.
 
-Commit can be invoked from UI as shown by pressing the Sync button. 
+Commit can be invoked from the UI as shown by pressing the Sync button. 
 
 ![Git commit entire project](gitbulkcommit.png)
 
-User will have chance to select assets to commit or can commit the entire project.
+Users will have chance to select assets to commit or can commit the entire project.
 
 ![Add assets to commit](gitbulkcommit2.png)
 
-User will be prompted to enter commit message
+Users will be prompted to enter a commit message
 
 ![Add commit message to the PR](gitbulkcommit2.png)
 
-Once committed to git the repo structure would look like below. This repo `git-dsjob` has two projects under the branch `dsjob101`. Each project is committed to its own folder `dsjob-test` and `dsjob101` respectively.
+Once committed to git, the repo structure should look similar to the example below. This repo `git-dsjob` has two projects under the branch `dsjob101`. Each project is committed to its own folder `dsjob-test` and `dsjob101` respectively.
 
 ![Folder structure of a project](gitrepo.png)
 
@@ -217,7 +217,7 @@ Status code =  0
 ```
 
 #### Git Status
-Git Integration provides platform specific computations to determine if the resource in Git repository is same as the resource in CloudPak Project.
+Git Integration provides platform specific computations to determine if the resource in the Git repository is the same as the resource in the CloudPak Project.
 
 Status is displayed which is context based, during commit the source of truth is the project which means `created` refers to a resource in project but not in Git repository and vice versa. Object that are modified in the Project are shown as `updated`. During pull the source of truth comes from Git repository, a `created` object is an object that exists in Git repository and is ready to be pulled and created in the Project. 
 ![See status of Project Resources](gitstatus.png)
